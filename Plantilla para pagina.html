@@ -1,0 +1,531 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <!-- Hace que la página se adapte al celular -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mis Tarjetas</title>
+    <style>
+        :root {
+            --tinta: #17212b;
+            --texto-suave: #66727d;
+            --fondo: #f5f7f8;
+            --blanco: #ffffff;
+            --acento: #e36b4d;
+            --borde: #e5e9ec;
+        }
+
+        /* Toda la página */
+        * {
+            box-sizing: border-box;
+        }
+        body {
+            margin: 0;
+            font-family: "Trebuchet MS", "Segoe UI", sans-serif;
+            background: var(--fondo);
+            color: var(--tinta);
+        }
+        body.bloqueado {
+            min-height: 100vh;
+            background: var(--tinta);
+        }
+        .oculto {
+            display: none !important;
+        }
+        /* Pantalla de acceso */
+        .acceso {
+            display: grid;
+            place-items: center;
+            min-height: 100vh;
+            padding: 24px;
+            background: linear-gradient(135deg, #eef3f5 0%, #dbe5e9 100%);
+        }
+        .acceso-panel {
+            width: min(100%, 430px);
+            padding: 42px;
+            background: var(--blanco);
+            border: 1px solid #d5dee2;
+            border-radius: 10px;
+            box-shadow: 0 20px 50px rgba(23, 33, 43, 0.14);
+        }
+        .policia-riente {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 58px;
+            height: 58px;
+            margin: 0 auto 24px;
+            background: var(--tinta);
+            border: 5px solid #f4b942;
+            border-radius: 50%;
+            color: var(--blanco);
+            font-size: 28px;
+            line-height: 1;
+        }
+        .acceso-icono {
+            display: grid;
+            place-items: center;
+            width: 48px;
+            height: 48px;
+            margin-bottom: 28px;
+            background: #e5f4ed;
+            border-radius: 50%;
+            color: #24855b;
+            font-size: 22px;
+            animation: flotar 2.5s ease-in-out infinite;
+        }
+        .acceso h1 {
+            margin: 0;
+            font-family: Georgia, serif;
+            color: var(--tinta);
+            font-size: 32px;
+            font-weight: normal;
+            text-align: center;
+        }
+        .acceso p {
+            margin: 12px 0 28px;
+            color: var(--texto-suave);
+            font-size: 14px;
+            line-height: 1.6;
+            text-align: center;
+        }
+        .campo-contrasena {
+            display: block;
+            margin-bottom: 10px;
+            color: var(--tinta);
+            font-size: 13px;
+            font-weight: bold;
+        }
+        .acceso input {
+            width: 100%;
+            padding: 14px 15px;
+            border: 1px solid #cbd3d8;
+            border-radius: 4px;
+            color: var(--tinta);
+            font: inherit;
+            outline: none;
+        }
+        .acceso input:focus {
+            border-color: var(--acento);
+            box-shadow: 0 0 0 3px rgba(227, 107, 77, 0.15);
+        }
+        .boton-acceso,
+        .boton-salir {
+            border: 0;
+            border-radius: 4px;
+            cursor: pointer;
+            font: inherit;
+            font-weight: bold;
+        }
+        .boton-acceso {
+            width: 100%;
+            margin-top: 14px;
+            padding: 14px;
+            background: #24855b;
+            color: var(--blanco);
+            transition: transform 160ms ease, background 160ms ease;
+        }
+        .boton-acceso:hover {
+            background: #196b48;
+            transform: translateY(-1px);
+        }
+        .error-contrasena {
+            min-height: 20px;
+            margin: 10px 0 0 !important;
+            color: #b33b2c !important;
+            font-size: 13px !important;
+        }
+        .boton-salir {
+            padding: 9px 14px;
+            background: transparent;
+            border: 1px solid rgba(255, 255, 255, 0.35);
+            color: var(--blanco);
+            font-size: 12px;
+        }
+        .boton-salir:hover {
+            background: rgba(255, 255, 255, 0.1);
+        }
+        .placa-agente {
+            margin: 0 0 12px;
+            color: #24855b;
+            font-size: 11px;
+            font-weight: bold;
+            letter-spacing: 1px;
+            text-align: center;
+            text-transform: uppercase;
+        }
+        @keyframes flotar {
+            0%, 100% { transform: translateY(0) rotate(-6deg); }
+            50% { transform: translateY(-5px) rotate(6deg); }
+        }
+        /* Encabezado */
+        header {
+            position: relative;
+            overflow: hidden;
+            background: linear-gradient(120deg, #17212b 0%, #1f4d61 58%, #24855b 100%);
+            color: var(--blanco);
+            padding: 22px 24px 28px;
+        }
+        header::after {
+            content: "";
+            position: absolute;
+            width: 360px;
+            height: 360px;
+            right: -100px;
+            top: -190px;
+            border: 38px solid rgba(244, 185, 66, 0.9);
+            border-radius: 50%;
+            box-shadow: 0 0 0 18px rgba(255, 255, 255, 0.08), 0 0 0 56px rgba(255, 255, 255, 0.04);
+        }
+        .encabezado-interior {
+            position: relative;
+            z-index: 1;
+            width: min(100%, 980px);
+            margin: 0 auto;
+        }
+        .barra-encabezado {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+        .identidad-oficial {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        .sello-oficial {
+            display: grid;
+            place-items: center;
+            width: 42px;
+            height: 42px;
+            background: #f4b942;
+            border: 3px solid #fff;
+            border-radius: 50%;
+            color: var(--tinta);
+            font-size: 20px;
+            box-shadow: 0 3px 0 rgba(0, 0, 0, 0.18);
+        }
+        .nombre-oficial {
+            margin: 0;
+            color: var(--blanco);
+            font-size: 12px;
+            font-weight: bold;
+            letter-spacing: 1.2px;
+            text-transform: uppercase;
+        }
+        .subnombre-oficial {
+            margin: 3px 0 0;
+            color: #aebbc3;
+            font-size: 11px;
+        }
+        .marca {
+            margin: 0 0 34px;
+            color: #ffb39e;
+            font-size: 12px;
+            font-weight: bold;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+        }
+        header h1 {
+            margin: 0;
+            max-width: 620px;
+            font-family: Georgia, serif;
+            font-size: clamp(38px, 6vw, 64px);
+            font-weight: normal;
+            line-height: 1.02;
+            letter-spacing: 0;
+        }
+        header h1::first-line {
+            color: #fff5cf;
+        }
+        header p {
+            max-width: 470px;
+            margin: 18px 0 0;
+            color: #c8d0d6;
+            font-size: 17px;
+            line-height: 1.6;
+        }
+        /* Contenedor principal */
+        .contenedor {
+            width: min(100% - 48px, 980px);
+            margin: 0 auto;
+            padding: 16px 0 34px;
+        }
+        .contenedor {
+            display: flex;
+            flex-direction: column;
+        }
+        #contenidoProtegido {
+            min-height: 100vh;
+            background: linear-gradient(180deg, #f5f7f8 0%, #ffffff 62%, #f5f7f8 100%);
+        }
+        .barra-estado {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 20px;
+            margin-bottom: 14px;
+            padding: 14px 18px;
+            background: #e5f4ed;
+            border-left: 4px solid #24855b;
+            color: #196b48;
+            font-size: 13px;
+            order: 2;
+        }
+        .estado-activo {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-weight: bold;
+        }
+        .punto-activo {
+            width: 9px;
+            height: 9px;
+            background: #24855b;
+            border-radius: 50%;
+            box-shadow: 0 0 0 4px rgba(36, 133, 91, 0.15);
+        }
+        .intro {
+            display: flex;
+            align-items: end;
+            justify-content: space-between;
+            gap: 24px;
+            margin-bottom: 18px;
+            order: 3;
+        }
+        .intro h2 {
+            margin: 0;
+            font-family: Georgia, serif;
+            font-size: 32px;
+            font-weight: normal;
+        }
+        .intro h2::after {
+            content: "";
+            display: block;
+            width: 44px;
+            height: 4px;
+            margin-top: 12px;
+            background: var(--acento);
+        }
+        .intro p {
+            margin: 0 0 3px;
+            color: var(--texto-suave);
+            font-size: 14px;
+        }
+        /* Cada tarjeta */
+        .tarjeta {
+            overflow: hidden;
+            background: var(--blanco);
+            border: 1px solid #dce4e7;
+            border-top: 5px solid var(--acento);
+            border-radius: 8px;
+            margin-bottom: 24px;
+            box-shadow: 0 12px 30px rgba(23, 33, 43, 0.07);
+            transition: transform 180ms ease, box-shadow 180ms ease;
+        }
+        .tarjeta:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 18px 36px rgba(23, 33, 43, 0.12);
+        }
+        .tarjeta-contenido {
+            padding: 24px 28px 28px;
+        }
+        .tarjeta-cabecera {
+            display: flex;
+            align-items: start;
+            justify-content: space-between;
+            gap: 20px;
+        }
+        .numero-documento {
+            color: #aebbc3;
+            font-family: Georgia, serif;
+            font-size: 25px;
+        }
+        .etiqueta {
+            display: block;
+            margin-bottom: 10px;
+            color: var(--acento);
+            font-size: 11px;
+            font-weight: bold;
+            letter-spacing: 1.5px;
+            text-transform: uppercase;
+        }
+        .tarjeta h2 {
+            margin: 0;
+            min-height: 30px;
+            font-family: Georgia, serif;
+            font-size: 24px;
+            font-weight: normal;
+        }
+        /* Imagen */
+        .tarjeta img {
+            width: 100%;
+            height: auto;
+            padding: 12px;
+            display: block;
+            background: #e9edef;
+        }
+        /* Texto pequeño */
+        .informacion {
+            margin: 12px 0 0;
+            color: var(--texto-suave);
+            font-size: 14px;
+            line-height: 1.6;
+        }
+        /* Pie de página */
+        footer {
+            text-align: center;
+            padding: 30px 24px 42px;
+            color: var(--texto-suave);
+            border-top: 1px solid var(--borde);
+            font-size: 13px;
+        }
+        footer strong {
+            color: var(--tinta);
+        }
+        .tarjetas {
+            display: block;
+            order: 1;
+        }
+        @media (max-width: 520px) {
+            .acceso-panel {
+                padding: 32px 24px;
+            }
+            header {
+                padding: 34px 24px 42px;
+            }
+            .marca {
+                margin-bottom: 42px;
+            }
+            .barra-estado {
+                align-items: start;
+                flex-direction: column;
+                gap: 6px;
+            }
+            .contenedor {
+                width: min(100% - 32px, 980px);
+                padding-top: 42px;
+            }
+            .intro {
+                display: block;
+            }
+            .intro p {
+                margin-top: 8px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <section class="acceso" id="pantallaAcceso" aria-labelledby="tituloAcceso">
+        <div class="acceso-panel">
+            <div class="policia-riente" aria-label="Distintivo de seguridad institucional" role="img">&#9733;</div>
+            <p class="placa-agente">Portal oficial · Acceso seguro</p>
+            <h1 id="tituloAcceso">Acceso a documentos</h1>
+            <p>Introduce tu contraseña para consultar la información protegida.</p>
+            <form id="formularioAcceso">
+                <label class="campo-contrasena" for="contrasena">Contraseña</label>
+                <input id="contrasena" name="contrasena" type="password" autocomplete="current-password" required>
+                <button class="boton-acceso" type="submit">Ingresar al portal</button>
+                <p class="error-contrasena" id="mensajeError" role="alert" aria-live="polite"></p>
+            </form>
+        </div>
+    </section>
+
+    <div id="contenidoProtegido" class="oculto">
+    <!-- Encabezado -->
+    <header>
+        <div class="encabezado-interior">
+            <div class="barra-encabezado">
+                <div class="identidad-oficial">
+                    <div class="sello-oficial" aria-hidden="true">&#9733;</div>
+                    <div>
+                        <p class="nombre-oficial">Portal oficial</p>
+                        <p class="subnombre-oficial">Unidad de documentos digitales</p>
+                    </div>
+                </div>
+                <button class="boton-salir" id="botonSalir" type="button">Cerrar sesión</button>
+            </div>
+            <h1>Mis Tarjetas Digitales</h1>
+            <p>Tu información importante, reunida en un solo lugar y siempre bajo control.</p>
+        </div>
+    </header>
+    <!-- Contenido -->
+    <main class="contenedor">
+        <div class="barra-estado">
+            <span class="estado-activo"><span class="punto-activo"></span>Sesión protegida y activa</span>
+            <span>Acceso autorizado</span>
+        </div>
+        <div class="intro">
+            <h2>Documentos destacados</h2>
+            <p>Explora tu archivo personal</p>
+        </div>
+        <div class="tarjetas">
+            <article class="tarjeta">
+                <img src="imagen/Circulacion1.png" alt="Vista previa de la tarjeta principal">
+                <div class="tarjeta-contenido">
+                    <div class="tarjeta-cabecera">
+                        <div>
+                            <span class="etiqueta">Documento 01</span>
+                            <h2>Tarjeta principal</h2>
+                        </div>
+                        <span class="numero-documento">01</span>
+                    </div>
+                    <p class="informacion">Información de mi tarjeta.</p>
+                </div>
+            </article>
+            <article class="tarjeta">
+                <img src="imagen/Circulacion2.png" alt="Vista previa de la segunda tarjeta">
+                <div class="tarjeta-contenido">
+                    <div class="tarjeta-cabecera">
+                        <div>
+                            <span class="etiqueta">Documento 02</span>
+                            <h2>Otra tarjeta</h2>
+                        </div>
+                        <span class="numero-documento">02</span>
+                    </div>
+                    <p class="informacion">Información de mi segunda tarjeta.</p>
+                </div>
+            </article>
+        </div>
+    </main>
+    <!-- Pie de página -->
+    <footer>
+        <strong>Portal oficial de documentos digitales</strong><br>
+        Información privada · Acceso protegido
+    </footer>
+    </div>
+    <script>
+        const CONTRASENA = "0000";
+        const pantallaAcceso = document.getElementById("pantallaAcceso");
+        const contenidoProtegido = document.getElementById("contenidoProtegido");
+        const formularioAcceso = document.getElementById("formularioAcceso");
+        const campoContrasena = document.getElementById("contrasena");
+        const mensajeError = document.getElementById("mensajeError");
+        const botonSalir = document.getElementById("botonSalir");
+
+        formularioAcceso.addEventListener("submit", function (evento) {
+            evento.preventDefault();
+
+            if (campoContrasena.value === CONTRASENA) {
+                pantallaAcceso.classList.add("oculto");
+                contenidoProtegido.classList.remove("oculto");
+                document.body.classList.remove("bloqueado");
+                formularioAcceso.reset();
+                mensajeError.textContent = "";
+            } else {
+                mensajeError.textContent = "¡Alto! Esa clave no aparece en el expediente, agente.";
+                campoContrasena.select();
+            }
+        });
+
+        botonSalir.addEventListener("click", function () {
+            contenidoProtegido.classList.add("oculto");
+            pantallaAcceso.classList.remove("oculto");
+            document.body.classList.add("bloqueado");
+            campoContrasena.focus();
+        });
+    </script>
+</body>
+</html>
